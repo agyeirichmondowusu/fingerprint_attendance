@@ -58,6 +58,10 @@ SPREADSHEET_ID = "1uoRqz984lwGvmIE4lV7-8AMk2KFFCbqf-buzN9tz9vU"
 
 @app.post("/att_id")
 async def mark_attendance(request: Request):
+    # Authenticate
+    creds = Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    gc = gspread.authorize(creds)
     data = await request.json()
     student_id = str(data.get("id"))
     # student_id = "15"
@@ -99,9 +103,5 @@ if __name__=='__main__':
         print("Exists")
     else:
         download_json_file()
-        # Authenticate
-        creds = Credentials.from_service_account_file(
-            SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-        gc = gspread.authorize(creds)
 
     uvicorn.run(app, host="0.0.0.0", port=8580)
