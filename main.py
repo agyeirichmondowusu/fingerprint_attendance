@@ -59,8 +59,19 @@ SPREADSHEET_ID = "1uoRqz984lwGvmIE4lV7-8AMk2KFFCbqf-buzN9tz9vU"
 @app.post("/att_id")
 async def mark_attendance(request: Request):
     # Authenticate
-    creds = Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    # creds = Credentials.from_service_account_file(
+    #     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+     # ✅ Authenticate from environment variable or fallback to file
+    if "GOOGLE_CREDENTIALS" in os.environ:
+        creds_info = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+        creds = service_account.Credentials.from_service_account_info(
+            creds_info, scopes=SCOPES
+        )
+    else:
+        # Fallback if you're testing locally and have credentials.json
+        creds = service_account.Credentials.from_service_account_file(
+            "credentials.json", scopes=SCOPES
+        )
     gc = gspread.authorize(creds)
     data = await request.json()
     student_id = str(data.get("id"))
@@ -98,10 +109,10 @@ async def mark_attendance(request: Request):
 
 
 
-if __name__=='__main__':
-    if os.path.exists(SERVICE_ACCOUNT_FILE):
-        print("Exists")
-    else:
-        download_json_file()
+# if __name__=='__main__':
+#     if os.path.exists(SERVICE_ACCOUNT_FILE):
+#         print("Exists")
+#     else:
+#         download_json_file()
 
-    uvicorn.run(app, host="0.0.0.0", port=8580)
+#     uvicorn.run(app, host="0.0.0.0", port=8580)
