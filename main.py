@@ -108,12 +108,3 @@ async def mark_attendance(request: Request):
 
     return {"status": f"✅ Attendance marked for ID {student_id}", "time": now_time}
 
-
-
-# if __name__=='__main__':
-#     if os.path.exists(SERVICE_ACCOUNT_FILE):
-#         print("Exists")
-#     else:
-#         download_json_file()
-
-#     uvicorn.run(app, host="0.0.0.0", port=8580)
