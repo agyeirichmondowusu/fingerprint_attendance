@@ -17,31 +17,31 @@ import json
 
 app = FastAPI()
 
-# Step 1: Download service account key from Dropbox
-dropbox_url = 'https://www.dropbox.com/scl/fi/m0rzm0gchg3hlbqnd2wjt/credentials.json?rlkey=p18jdyr8ldqw3ir4cr02zbavt&st=hd57u8oq&dl=1'
-response = requests.get(dropbox_url)
-response.raise_for_status()
-service_account_info = response.json()
+# # Step 1: Download service account key from Dropbox
+# dropbox_url = 'https://www.dropbox.com/scl/fi/m0rzm0gchg3hlbqnd2wjt/credentials.json?rlkey=p18jdyr8ldqw3ir4cr02zbavt&st=hd57u8oq&dl=1'
+# response = requests.get(dropbox_url)
+# response.raise_for_status()
+# service_account_info = response.json()
 
-# Step 2: Authenticate using service account
-SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
-credentials = service_account.Credentials.from_service_account_info(
-    service_account_info, scopes=SCOPES)
+# # Step 2: Authenticate using service account
+# SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
+# credentials = service_account.Credentials.from_service_account_info(
+#     service_account_info, scopes=SCOPES)
 
-# Step 3: Download file from Google Drive
-def download_json_file():
-    file_id = '1zNhAOzCnq4I9CccyFz9tnPdgtz_MH4VP'
-    service = build('drive', 'v3', credentials=credentials)
-    request = service.files().get_media(fileId=file_id)
-    fh = io.FileIO(SERVICE_ACCOUNT_FILE, 'wb')
-    downloader = MediaIoBaseDownload(fh, request)
+# # Step 3: Download file from Google Drive
+# def download_json_file():
+#     file_id = '1zNhAOzCnq4I9CccyFz9tnPdgtz_MH4VP'
+#     service = build('drive', 'v3', credentials=credentials)
+#     request = service.files().get_media(fileId=file_id)
+#     fh = io.FileIO(SERVICE_ACCOUNT_FILE, 'wb')
+#     downloader = MediaIoBaseDownload(fh, request)
 
-    done = False
-    while not done:
-        status, done = downloader.next_chunk()
-        print(f"Download progress: {int(status.progress() * 100)}%")
+#     done = False
+#     while not done:
+#         status, done = downloader.next_chunk()
+#         print(f"Download progress: {int(status.progress() * 100)}%")
 
-    print(f"Downloaded file saved to {SERVICE_ACCOUNT_FILE}")
+#     print(f"Downloaded file saved to {SERVICE_ACCOUNT_FILE}")
 
 # download_json_file()
 
