@@ -57,6 +57,44 @@ SERVICE_ACCOUNT_FILE = "credentials.json"
 SPREADSHEET_ID = "1uoRqz984lwGvmIE4lV7-8AMk2KFFCbqf-buzN9tz9vU"
 
 
+@app.post("/add_scholar")
+async def add_scholar(request: Request):
+    data = await request.json()
+    first_name = str(data.get("first_name"))
+    middle_name = str(data.get("middle_name"))
+    last_name = str(data.get("last_name"))
+    gender = str(data.get("gender"))
+    residence = str(data.get("residence"))
+    baptism_status = str(data.get("baptism_status"))
+    parent_name = str(data.get("parent_name"))
+    parent_contact = str(data.get("parent_contact"))
+    date_of_birth = str(data.get("dob"))
+
+    sh = gc.open_by_key(SPREADSHEET_ID)
+    worksheet = sh.get_worksheet(0)  # First sheet
+
+    columns = worksheet.row_values(1)  # Get header row
+    id_column = worksheet.col_values(1)
+    if len(id_column) > 1:
+        last_id = id_column[-1]
+        new_id = int(last_id)+1
+
+    record_dict = [
+        int(new_id),
+        f'{first_name} {middle_name} {last_name}',
+        gender,
+        date_of_birth,
+        baptism_status,
+        parent_name,
+        parent_contact,
+        residence
+    ]
+
+    response = worksheet.append_row(record_dict)
+
+    return response
+
+
 @app.post("/att_id")
 async def mark_attendance(request: Request):
     # Authenticate
