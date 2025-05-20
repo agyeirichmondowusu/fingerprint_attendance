@@ -57,8 +57,21 @@ SERVICE_ACCOUNT_FILE = "credentials.json"
 SPREADSHEET_ID = "1uoRqz984lwGvmIE4lV7-8AMk2KFFCbqf-buzN9tz9vU"
 
 
+
 @app.post("/add_scholar")
 async def add_scholar(request: Request):
+    if "GOOGLE_CREDENTIALS" in os.environ:
+        creds_info = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+        creds = service_account.Credentials.from_service_account_info(
+        creds_info, scopes=SCOPES
+        )
+    else:
+        # Fallback if you're testing locally and have credentials.json
+        creds = service_account.Credentials.from_service_account_file(
+            "credentials.json", scopes=SCOPES
+        )
+    gc = gspread.authorize(creds)
+          
     data = await request.json()
     first_name = str(data.get("first_name"))
     middle_name = str(data.get("middle_name"))
