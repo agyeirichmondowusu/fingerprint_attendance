@@ -44,22 +44,7 @@ app = FastAPI()
 #     print(f"Downloaded file saved to {SERVICE_ACCOUNT_FILE}")
 
 # download_json_file()
-
-
-# Define Google Sheets scopes
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets",
-          "https://www.googleapis.com/auth/drive"]
-
-# Path to your service account credentials
-SERVICE_ACCOUNT_FILE = "credentials.json"
-
-# Your Google Sheet ID (get this from the URL of the sheet)
-SPREADSHEET_ID = "1uoRqz984lwGvmIE4lV7-8AMk2KFFCbqf-buzN9tz9vU"
-
-
-
-@app.post("/add_scholar")
-async def add_scholar(request: Request):
+def init():
     if "GOOGLE_CREDENTIALS" in os.environ:
         creds_info = json.loads(os.environ["GOOGLE_CREDENTIALS"])
         creds = service_account.Credentials.from_service_account_info(
@@ -70,6 +55,29 @@ async def add_scholar(request: Request):
         creds = service_account.Credentials.from_service_account_file(
             "credentials.json", scopes=SCOPES
         )
+    return creds
+
+# Define Google Sheets scopes
+
+@app.get("/all_rows")
+async def get_all_rows():
+    # Authenticate with Google Sheets
+    creds = init()
+    gc = gspread.authorize(creds)
+
+    # Open the spreadsheet
+    spreadsheet = gc.open("attendance_sheet")  # Replace with your sheet name
+    worksheet = spreadsheet.sheet1  # or .worksheet("Sheet1")
+
+    # Get all rows as a list of lists
+    rows = worksheet.get_all_values()  # [[row1], [row2], [row3], ...]
+
+    return JSONResponse(content={"rows": rows})
+
+
+@app.post("/add_scholar")
+async def add_scholar(request: Request):
+    creds = init()
     gc = gspread.authorize(creds)
           
     data = await request.json()
@@ -114,16 +122,8 @@ async def mark_attendance(request: Request):
     # creds = Credentials.from_service_account_file(
     #     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
      # ✅ Authenticate from environment variable or fallback to file
-    if "GOOGLE_CREDENTIALS" in os.environ:
-        creds_info = json.loads(os.environ["GOOGLE_CREDENTIALS"])
-        creds = service_account.Credentials.from_service_account_info(
-            creds_info, scopes=SCOPES
-        )
-    else:
-        # Fallback if you're testing locally and have credentials.json
-        creds = service_account.Credentials.from_service_account_file(
-            "credentials.json", scopes=SCOPES
-        )
+
+    creds = init()
     gc = gspread.authorize(creds)
     data = await request.json()
     student_id = str(data.get("id"))
