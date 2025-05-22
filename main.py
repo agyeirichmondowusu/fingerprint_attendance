@@ -43,6 +43,11 @@ app = FastAPI()
 
 #     print(f"Downloaded file saved to {SERVICE_ACCOUNT_FILE}")
 
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets",
+          "https://www.googleapis.com/auth/drive"]
+# Your Google Sheet ID (get this from the URL of the sheet)
+SPREADSHEET_ID = "1uoRqz984lwGvmIE4lV7-8AMk2KFFCbqf-buzN9tz9vU"
+
 # download_json_file()
 def init():
     if "GOOGLE_CREDENTIALS" in os.environ:
